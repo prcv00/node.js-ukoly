@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo seznam</title>
+  </head>
+  <body>
+    <h1>&#9989; Todo seznam</h1>
+
+    <div id="todos"><%- include('_todos.html') %></div>
+
+    <hr />
+
+    <fieldset>
+      <legend><strong>Přidat nový úkol</strong></legend>
+      <form method="post" action="/add-todo">
+        <label>Název úkolu:</label>
+        <br />
+        <input name="title" size="40" placeholder="Co je potřeba udělat?" />
+        <br />
+        <label>Priorita:</label>
+        <br />
+        <select name="priority">
+          <option value="low">Nízká</option>
+          <option value="medium">Střední</option>
+          <option value="high">Vysoká</option>
+        </select>
+        <button type="submit">&#43; Přidat</button>
+      </form>
+    </fieldset>
+
+    <script>
+      const ws = new WebSocket('ws://localhost:3000/ws')
+
+      ws.addEventListener('message', (ev) => {
+        const json = JSON.parse(ev.data)
+        if (json.type === 'todos') {
+          document.getElementById('todos').innerHTML = json.html
+        }
+      })
+    </script>
+  </body>
+</html>

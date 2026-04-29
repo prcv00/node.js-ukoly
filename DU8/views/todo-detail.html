@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= todo.title %> – Todo detail</title>
+  </head>
+  <body>
+    <p><a href="/">&larr; Zpět na seznam</a></p>
+
+    <div id="todo"><%- include('_todo.html') %></div>
+
+    <hr />
+
+    <fieldset>
+      <legend><strong>Upravit název úkolu</strong></legend>
+      <form method="post" action="/update-todo/<%= todo.id %>">
+        <label for="title">Nový název:</label>
+        <br />
+        <input id="title" name="title" size="40" value="<%= todo.title %>" />
+        <br />
+        <label>Priorita:</label>
+        <br />
+        <select name="priority">
+          <option value="low" <%= todo.priority === 'low' ? 'selected' : '' %>>Nízká</option>
+          <option value="medium" <%= todo.priority === 'medium' ? 'selected' : '' %>>Střední</option>
+          <option value="high" <%= todo.priority === 'high' ? 'selected' : '' %>>Vysoká</option>
+        </select>
+        <button type="submit">&#10003; Uložit</button>
+      </form>
+    </fieldset>
+
+    <script>
+      const ws = new WebSocket('ws://localhost:3000/ws')
+
+      ws.addEventListener('message', (ev) => {
+        const json = JSON.parse(ev.data)
+        if (json.type === 'todo-detail' && String(json.id) === "<%= todo.id %>") {
+          document.getElementById('todo').innerHTML = json.html
+        } else if (json.type === 'todo-removed' && String(json.id) === "<%= todo.id %>") {
+          document.location.replace('/')
+        }
+      })
+    </script>
+  </body>
+</html>
